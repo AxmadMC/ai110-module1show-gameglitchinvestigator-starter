@@ -1,3 +1,5 @@
+# FIX: Refactored the game logic into logic_utils.py using VS Code AI chat;
+#      reviewed the diff for each file and kept the changes.
 import random
 import streamlit as st
 
@@ -28,23 +30,34 @@ def parse_guess(raw: str):
 
     return True, value, None
 
-
-def check_guess(guess, secret):
-    if guess == secret:
-        return "Win", "🎉 Correct!"
+# FIX: Corrected high/low logic, added range validation, and improved hint messages.
+#      Verified with pytest and manual gameplay.
+def check_guess(guess, secret, low=None, high=None):
+    """Return (result, message, hint) for a guessed number against the secret."""
+    if isinstance(guess, bool) or isinstance(secret, bool):
+        return "Invalid", "Guess must be a number.", "Enter a valid integer."
 
     try:
-        if guess > secret:
-            return "Too High", "📈 Go HIGHER!"
-        else:
-            return "Too Low", "📉 Go LOWER!"
-    except TypeError:
-        g = str(guess)
-        if g == secret:
-            return "Win", "🎉 Correct!"
-        if g > secret:
-            return "Too High", "📈 Go HIGHER!"
-        return "Too Low", "📉 Go LOWER!"
+        guess_value = int(guess)
+        secret_value = int(secret)
+    except (TypeError, ValueError):
+        return "Invalid", "Guess must be a number.", "Enter a valid integer."
+
+    if low is not None and high is not None:
+        if guess_value < low or guess_value > high:
+            return (
+                "Invalid",
+                f"Guess must be between {low} and {high}.",
+                f"Choose a number between {low} and {high}.",
+            )
+
+    if guess_value == secret_value:
+        return "Win", "🎉 Correct!", "You guessed the secret number!"
+
+    if guess_value > secret_value:
+        return "Too High", "Your guess is too high.", "📉 Go LOWER!"
+
+    return "Too Low", "Your guess is too low.", "📈 Go HIGHER!"
 
 
 def update_score(current_score: int, outcome: str, attempt_number: int):
@@ -107,7 +120,7 @@ if "history" not in st.session_state:
 st.subheader("Make a guess")
 
 st.info(
-    f"Guess a number between 1 and 100. "
+    f"Guess a number between {low} and {high}. "
     f"Attempts left: {attempt_limit - st.session_state.attempts}"
 )
 
@@ -160,10 +173,10 @@ if submit:
         else:
             secret = st.session_state.secret
 
-        outcome, message = check_guess(guess_int, secret)
+        outcome, message, hint = check_guess(guess_int, secret, low=low, high=high)
 
         if show_hint:
-            st.warning(message)
+            st.warning(hint)
 
         st.session_state.score = update_score(
             current_score=st.session_state.score,
