@@ -28,14 +28,14 @@ It wrote the code, ran away, and now the game is unplayable.
 - [ ] Game Glitch Investigator is a Streamlit number guessing game. The player picks a difficulty (Easy 1–20, Normal 1–100, Hard 1–50), then tries to guess a secret number within a limited number of attempts. After each guess the game gives a hint ("Go HIGHER" or "Go LOWER") and updates the score. 
 The starter code was written by an AI and contained bugs that I had to find, explain, and fix. 
 
-The hints were backwards: guessing 1 said "Go LOWER" and guessing 1000 said "Go HIGHER".
+[ ] The hints were backwards: guessing 1 said "Go LOWER" and guessing 1000 said "Go HIGHER".
 Guesses outside the range were accepted (1000 was allowed when the range was 1–100).
 The secret number was turned into text on every even attempt, which broke the high/low comparison.
 Attempts started at 1 instead of 0, so the player lost an attempt before guessing.
 The info box always said "between 1 and 100", no matter the difficulty.
 New Game didn't reset the score, history, or win/lose status, and ignored the difficulty range.
 
-Moved get_range_for_difficulty, parse_guess, check_guess, and update_score from app.py into logic_utils.py, and imported them in app.py.
+[ ] Moved get_range_for_difficulty, parse_guess, check_guess, and update_score from app.py into logic_utils.py, and imported them in app.py.
 Swapped the hint messages so "Too High" says "Go LOWER" and "Too Low" says "Go HIGHER".
 Added a range check to parse_guess so out-of-range guesses show an error.
 Removed the code that turned the secret into a string, and the string-comparison fallback in check_guess.
